@@ -52,7 +52,7 @@ public class FundNetWorthGrab extends Grab {
             /**
              * 基金净值获取前 策略执行
              */
-            beforeHandlerNetWorthStrategy.handler();
+            //beforeHandlerNetWorthStrategy.handler();
             List<FundNetWorth> fundNetWorthList = new ArrayList<FundNetWorth>();
             for (Fund fund : fundList) {
                 try {

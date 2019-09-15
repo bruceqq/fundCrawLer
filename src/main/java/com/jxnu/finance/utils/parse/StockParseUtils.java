@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -23,7 +25,8 @@ import java.util.*;
 /**
  * 股票解析工具类
  */
-public class StockParseUtils {
+public class StockParseUtils{
+    private static final Logger logger = LoggerFactory.getLogger(StockParseUtils.class);
     /**
      * 基金重仓股票
      *
@@ -184,6 +187,7 @@ public class StockParseUtils {
         if (StringUtils.isBlank(response)) {
             return stockIndicator;
         }
+        logger.info("url:{},response:{}",url,response);
         JSONObject json = (JSONObject) JSONObject.parse(response);
         if (json == null) {
             return stockIndicator;
@@ -203,6 +207,7 @@ public class StockParseUtils {
         }
 
         totalMarketValue = NumberUtil.calculate(stockInfo.getBigDecimal("f20"));
+
         pb = stockInfo.getDoubleValue("f23");
         pe = stockInfo.getDoubleValue("f9");
         netWorth = NumberUtil.calculate(stockInfo.getBigDecimal("f135"));
@@ -216,14 +221,14 @@ public class StockParseUtils {
         netInterestRate = stockInfo.getDoubleValue("f129");
         roe = stockInfo.getDouble("f37");
 
-        stockIndicator.setTotalMarketValue(stockInfo.getString("f1020") + "|" + totalMarketValue);
-        stockIndicator.setNetWorth(stockInfo.getString("f1135") + "|" + netWorth);
-        stockIndicator.setNetProfit(stockInfo.getString("f1045") + "|" + netProfit);
-        stockIndicator.setPe(stockInfo.getString("f1009") + "|" + pe);
-        stockIndicator.setPb(stockInfo.getString("f1023") + "|" + pb);
-        stockIndicator.setGrossProfitMargin(stockInfo.getString("f1049") + "|" + grossProfitMargin);
-        stockIndicator.setNetInterestRate(stockInfo.getString("f1129") + "|" + netInterestRate);
-        stockIndicator.setRoe(stockInfo.getString("f1037") + "|" + roe);
+        stockIndicator.setTotalMarketValue(totalMarketValue.toString());
+        stockIndicator.setNetWorth(netWorth.toString());
+        stockIndicator.setNetProfit(netProfit.toString());
+        stockIndicator.setPe(pe.toString());
+        stockIndicator.setPb(pb.toString());
+        stockIndicator.setGrossProfitMargin(grossProfitMargin.toString());
+        stockIndicator.setNetInterestRate(netInterestRate.toString());
+        stockIndicator.setRoe(roe.toString());
         stockIndicator.setSubject(subject);
         return stockIndicator;
     }

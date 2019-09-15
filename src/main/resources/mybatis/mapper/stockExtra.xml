@@ -20,7 +20,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="java.util.List">
-        INSERT tbl_stock_extra(
+        INSERT ignore into tbl_stock_extra(
         stock_code,
         stock_name,
         create_time,
