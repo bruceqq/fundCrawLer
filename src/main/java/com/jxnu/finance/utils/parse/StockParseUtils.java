@@ -77,7 +77,7 @@ public class StockParseUtils {
                  */
                 String shareOutUrl = "http://dcfm.eastmoney.com/EM_MutiSvcExpandInterface/api/js/get?type=DCSOBS&token=70f12f2f4f091e459a279469fe49eca5&p=1&ps=50&sr=-1&st=ReportingPeriod&filter=&cmd=#&js=var%20CnPwAIGw={pages:(tp),data:(x)}&rt=52523179";
                 shareOutUrl = shareOutUrl.replace("#", stockCode);
-                Float shareOut = shareOut(shareOutUrl);
+                shareOut(shareOutUrl, stock);
                 /**
                  * 股票名称
                  */
@@ -89,9 +89,6 @@ public class StockParseUtils {
                 stock.setPrice(StockParseUtils.stockPrice(stockCode));
                 stock.setStockUrl(newStockUrl);
                 stock.setTotalShare(shares(stockCode));
-                if (shareOut != null) {
-                    stock.setShareOut(shareOut.toString());
-                }
                 stocks.add(stock);
                 CacheUtils.put(stockCode, stockCode);
             }
@@ -250,9 +247,9 @@ public class StockParseUtils {
         return stockIndicator;
     }
 
-    public static Float shareOut(String url) {
+    public static void shareOut(String url, FundStock fundStock) {
         if (StringUtils.isBlank(url)) {
-            return 0.0f;
+            return;
         }
         String document = OkHttpUtils.parseToString(url);
         if (StringUtils.isNotBlank(document)) {
@@ -265,23 +262,25 @@ public class StockParseUtils {
                     if (shareOutJson != null) {
                         document = shareOutJson.getString("AllocationPlan");
                     }
+                    if (shareOutJson != null && shareOutJson.containsKey("GXL")) {
+                        fundStock.setShareOutRatio(shareOutJson.getString("GXL"));
+                    }
                 }
                 if (StringUtils.isNotBlank(document)
                     && document.contains("派")) {
                     Double shareOut = Double.parseDouble(document.substring(document.indexOf("派") + 1, document.indexOf("元")).trim());
-                    if (shareOut != null) {
-                        Float result = CalculateUtil.divide(shareOut.floatValue(), 10.0f, 4);
-                        return result;
-                    }
+                    Float result = CalculateUtil.divide(shareOut.floatValue(), 10.0f, 4);
+                    fundStock.setShareOut(result.toString());
                 }
             } catch (Exception e) {
             }
         }
-        return 0.0f;
     }
 
 
     public static void main(String[] args) {
+        String url = "http://dcfm.eastmoney.com/EM_MutiSvcExpandInterface/api/js/get?type=DCSOBS&token=70f12f2f4f091e459a279469fe49eca5&p=1&ps=50&sr=-1&st=ReportingPeriod&filter=&cmd=600025&js=var%20CnPwAIGw={pages:(tp),data:(x)}&rt=52523179";
+        StockParseUtils.shareOut(url, null);
 
     }
 

@@ -25,5 +25,6 @@ public class FundStock {
     private String subject;            //行业
     private String price;              //股价
     private String totalShare;         //总份额
-    private String shareOut;           //分红
+    private String shareOut;           //股息
+    private String shareOutRatio;      //股息率
 }

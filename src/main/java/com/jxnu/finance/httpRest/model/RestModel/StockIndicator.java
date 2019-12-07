@@ -19,6 +19,7 @@ public class StockIndicator {
 
 
 
+
     public String getPe() {
         return pe;
     }

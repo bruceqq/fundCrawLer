@@ -26,5 +26,6 @@ public class StockExtra {
     private String subject;            //行业
     private String price;
     private String totalShare;         //总份额
-    private String shareOut;           //分红
+    private String shareOut;           //股息
+    private String shareOutRatio;      //股息率
 }
