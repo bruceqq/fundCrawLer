@@ -17,6 +17,7 @@
         <result property="subject" column="subject"/>
         <result property="price" column="price"/>
         <result property="totalShare" column="total_share"/>
+        <result property="shareOut" column="share_out"/>
     </resultMap>
 
     <insert id="insert" parameterType="java.util.List">
@@ -35,7 +36,8 @@
         roe,
         subject,
         price,
-        total_share
+        total_share,
+        share_out
         ) VALUES
         <foreach collection="list" separator="," item="stockExtra">
             (
@@ -53,7 +55,8 @@
             #{stockExtra.roe},
             #{stockExtra.subject},
             #{stockExtra.price},
-            #{stockExtra.totalShare}
+            #{stockExtra.totalShare},
+            #{stockExtra.shareOut}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -70,7 +73,8 @@
         subject=VALUES(subject),
         price=VALUES(price),
         create_time=VALUES(create_time),
-        total_share=VALUES(total_share)
+        total_share=VALUES(total_share),
+        share_out=VALUES(share_out)
     </insert>
 
 

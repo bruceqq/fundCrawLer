@@ -7,6 +7,7 @@ import com.jxnu.finance.httpRest.model.RestModel.StockIndicator;
 import com.jxnu.finance.store.entity.fund.FundStock;
 import com.jxnu.finance.store.entity.stock.StockiftBean;
 import com.jxnu.finance.utils.CacheUtils;
+import com.jxnu.finance.utils.CalculateUtil;
 import com.jxnu.finance.utils.NumberUtil;
 import com.jxnu.finance.utils.OkHttpUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,8 +26,9 @@ import java.util.*;
 /**
  * 股票解析工具类
  */
-public class StockParseUtils{
+public class StockParseUtils {
     private static final Logger logger = LoggerFactory.getLogger(StockParseUtils.class);
+
     /**
      * 基金重仓股票
      *
@@ -49,12 +51,16 @@ public class StockParseUtils{
                 if (stockCodeElement == null) {
                     continue;
                 }
-                //股票代码
+                /**
+                 * 股票代码
+                 */
                 String stockCode = stockCodeElement.text();
                 if (CacheUtils.get(stockCode, null) != null) {
                     continue;
                 }
-                //市盈率
+                /**
+                 * 市盈率
+                 */
                 String newStockUrl = stockUrl;
                 String oldStockUrl = "http://push2.eastmoney.com/api/qt/slist/get?spt=1&np=3&fltt=2&invt=2&fields=f9,f12,f13,f14,f20,f23,f37,f45,f49,f134,f135,f129,f1000,f2000,f3000&ut=bd1d9ddb04089700cf9c27f6f7426281&secid=";
                 if (stockCode.startsWith("00") || stockCode.startsWith("3")) {
@@ -66,7 +72,15 @@ public class StockParseUtils{
                 }
                 StockIndicator stockIndicator = parseEastMoney(oldStockUrl);
                 if (stockIndicator != null) BeanUtils.copyProperties(stockIndicator, stock);
-                //股票名称
+                /**
+                 * 分红
+                 */
+                String shareOutUrl = "http://dcfm.eastmoney.com/EM_MutiSvcExpandInterface/api/js/get?type=DCSOBS&token=70f12f2f4f091e459a279469fe49eca5&p=1&ps=50&sr=-1&st=ReportingPeriod&filter=&cmd=#&js=var%20CnPwAIGw={pages:(tp),data:(x)}&rt=52523179";
+                shareOutUrl = shareOutUrl.replace("#", stockCode);
+                Float shareOut = shareOut(shareOutUrl);
+                /**
+                 * 股票名称
+                 */
                 Element stockNameElement = tdElements.get(2);
                 stock.setStockCode(stockCode);
                 stock.setStockName(stockNameElement.text());
@@ -75,6 +89,9 @@ public class StockParseUtils{
                 stock.setPrice(StockParseUtils.stockPrice(stockCode));
                 stock.setStockUrl(newStockUrl);
                 stock.setTotalShare(shares(stockCode));
+                if (shareOut != null) {
+                    stock.setShareOut(shareOut.toString());
+                }
                 stocks.add(stock);
                 CacheUtils.put(stockCode, stockCode);
             }
@@ -187,7 +204,7 @@ public class StockParseUtils{
         if (StringUtils.isBlank(response)) {
             return stockIndicator;
         }
-        logger.info("url:{},response:{}",url,response);
+        logger.info("url:{},response:{}", url, response);
         JSONObject json = (JSONObject) JSONObject.parse(response);
         if (json == null) {
             return stockIndicator;
@@ -214,7 +231,7 @@ public class StockParseUtils{
         netProfit = NumberUtil.calculate(stockInfo.getBigDecimal("f45"));
         subject = industryInfo.getString("f14");
         if (StringUtils.isNotBlank(subject) &&
-                subject.contains("(行业平均)")) {
+            subject.contains("(行业平均)")) {
             subject = subject.replace("(行业平均)", "");
         }
         grossProfitMargin = stockInfo.getDoubleValue("f49");
@@ -233,11 +250,38 @@ public class StockParseUtils{
         return stockIndicator;
     }
 
+    public static Float shareOut(String url) {
+        if (StringUtils.isBlank(url)) {
+            return 0.0f;
+        }
+        String document = OkHttpUtils.parseToString(url);
+        if (StringUtils.isNotBlank(document)) {
+            try {
+                document = document.substring(document.indexOf("=") + 1);
+                JSONObject jsonObject = (JSONObject) JSONObject.parse(document);
+                if (jsonObject != null) {
+                    JSONArray jsonArray = jsonObject.getJSONArray("data");
+                    JSONObject shareOutJson = (JSONObject) jsonArray.get(0);
+                    if (shareOutJson != null) {
+                        document = shareOutJson.getString("AllocationPlan");
+                    }
+                }
+                if (StringUtils.isNotBlank(document)
+                    && document.contains("派")) {
+                    Double shareOut = Double.parseDouble(document.substring(document.indexOf("派") + 1, document.indexOf("元")).trim());
+                    if (shareOut != null) {
+                        Float result = CalculateUtil.divide(shareOut.floatValue(), 10.0f, 4);
+                        return result;
+                    }
+                }
+            } catch (Exception e) {
+            }
+        }
+        return 0.0f;
+    }
+
 
     public static void main(String[] args) {
-        String url = "http://push2.eastmoney.com/api/qt/slist/get?spt=1&np=3&fltt=2&invt=2&fields=f9,f12,f13,f14,f20,f23,f37,f45,f49,f134,f135,f129,f1000,f2000,f3000&ut=bd1d9ddb04089700cf9c27f6f7426281&secid=1.600438";
-        StockIndicator stockIndicator = StockParseUtils.parseEastMoney(url);
-        stockIndicator.getGrossProfitMargin();
 
     }
 

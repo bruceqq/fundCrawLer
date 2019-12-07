@@ -42,7 +42,7 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
     public void handler(List<FundNetWorth> fundNetWorthList, Fund fund) {
         String fundCode = "";
         if (fund == null || StringUtils.isBlank(fundCode = fund.getCode())) return;
-        List<String> times = TimeUtil.latestYear(3);
+        List<String> times = TimeUtil.latestYear(5);
         for (String time : times) {
             String newUrl = "";
             newUrl = url.replace("#", fundCode).replace("@", time).replace("$", String.valueOf(new Random(5).nextInt()));
