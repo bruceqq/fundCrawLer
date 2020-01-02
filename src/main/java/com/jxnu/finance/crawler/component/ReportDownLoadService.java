@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.jxnu.finance.config.CrawlerConfig;
+import com.jxnu.finance.store.entity.stock.StockExtra;
+import com.jxnu.finance.store.mapper.StockExtraStore;
 import com.jxnu.finance.utils.OkHttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,6 +21,8 @@ import java.util.Map;
 public class ReportDownLoadService {
     @Autowired
     private CrawlerConfig crawlerConfig;
+    @Autowired
+    private StockExtraStore stockExtraStore;
 
     /**
      * 下载对应股票年报
@@ -37,6 +42,9 @@ public class ReportDownLoadService {
          */
         Map<String, String> head = new HashMap<String, String>();
         head.put("Content-Type", "application/x-www-form-urlencoded");
+        /**
+         * 股票年度报告地址
+         */
         String result = OkHttpUtils.post(params, head, crawlerConfig.getTiantianStockAnnualReport());
         if (StringUtils.isBlank(result)) {
             return;
@@ -59,8 +67,16 @@ public class ReportDownLoadService {
             if (announcementTitle.contains("摘要") || announcementTitle.contains("主要")) {
                 continue;
             }
+            /**
+             * 题材名称
+             */
+            String subjectName = "默认";
+            StockExtra stockExtra = stockExtraStore.selectOne(stockCode);
+            if (stockExtra != null) {
+                subjectName = stockExtra.getSubject();
+            }
             String adjunctUrl = announcementJson.getString("adjunctUrl");
-            String filePath = crawlerConfig.getAnnualReportFilePath() + File.separator + stockName + File.separator + announcementTitle;
+            String filePath = crawlerConfig.getAnnualReportFilePath() + File.separator + subjectName + File.separator + stockName + File.separator + announcementTitle;
             File file = new File(filePath);
             if (file.exists()) {
                 continue;

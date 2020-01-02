@@ -82,4 +82,15 @@
     </insert>
 
 
+    <select id="selectOne" resultMap="stockExtraMap" parameterType="java.util.HashMap">
+        SELECT
+        *
+        FROM tbl_stock_extra
+        <where>
+            <if test="stockCode != null and stockCode != ''">
+                and stock_code = #{stockCode}
+            </if>
+        </where>
+    </select>
+
 </mapper>
