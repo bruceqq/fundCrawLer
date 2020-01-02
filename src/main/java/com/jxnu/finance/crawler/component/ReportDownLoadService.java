@@ -72,7 +72,7 @@ public class ReportDownLoadService {
              */
             String subjectName = "默认";
             StockExtra stockExtra = stockExtraStore.selectOne(stockCode);
-            if (stockExtra != null) {
+            if (stockExtra != null && StringUtils.isNotBlank(stockExtra.getSubject())) {
                 subjectName = stockExtra.getSubject();
             }
             String adjunctUrl = announcementJson.getString("adjunctUrl");
