@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -90,7 +93,6 @@ public class OkHttpUtils {
         return "";
     }
 
-
     //解析指定url,返回的数据
     public static String parseToString(String url) {
         try {
@@ -141,18 +143,60 @@ public class OkHttpUtils {
         return null;
     }
 
+    /**
+     * 下载对应文件
+     *
+     * @param url
+     * @param filePath
+     */
+    public static void fileDownLoad(String url, final String filePath) {
+        RateLimiter rateLimiter = RateLimiter.create(1);
+        if (rateLimiter.tryAcquire()) {
+            rateLimiter.acquire();
+            Call call = client.newCall(constructeRequst(url));
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    logger.error("url:{},Exception", ExceptionUtils.getRootCauseMessage(e));
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    /**
+                     * 创建目录
+                     */
+                    String fileCategory = filePath.substring(0, filePath.lastIndexOf(File.separator));
+                    File category = new File(fileCategory);
+                    if (category.exists()) {
+                        category.mkdirs();
+                    }
+                    /**
+                     * 下载文件
+                     */
+                    File file = new File(filePath);
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+
+                    if (response != null) {
+                        InputStream is = response.body().byteStream();
+                        FileOutputStream fos = new FileOutputStream(file);
+                        int len = 0;
+                        byte[] buffer = new byte[2048];
+                        while (-1 != (len = is.read(buffer))) {
+                            fos.write(buffer, 0, len);
+                        }
+                        fos.flush();
+                        fos.close();
+                        is.close();
+                    }
+                }
+            });
+        }
+    }
+
 
     public static void main(String[] args) {
-        Random random = new Random(1000);
-        String url = "http://data.eastmoney.com/DataCenter_V3/stockdata/getData.ashx";
-        Map<String, String> json = new HashMap();
-        json.put("url", "PCF10/RptLatestTarget2");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("SecurityCode", "770001.SH");
-        json.put("postData", jsonObject.toJSONString());
-        json.put("type", "post");
-        json.put("remove", "DRROE,DRPRPAA,incomeIncreaseBy,profitsIncreaseBy,DeductedEps,DilutedEps,ReportDate,Reason");
-        String body = OkHttpUtils.post(json, null, url);
-        body = body;
+        OkHttpUtils.fileDownLoad("http://static.cninfo.com.cn/finalpage/2019-04-25/1206094800.PDF", "F:\\工作\\2019年报.pdf");
     }
 }
