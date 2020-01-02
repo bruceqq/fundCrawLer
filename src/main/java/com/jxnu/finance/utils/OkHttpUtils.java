@@ -1,6 +1,5 @@
 package com.jxnu.finance.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.util.concurrent.RateLimiter;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -15,9 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -167,7 +164,7 @@ public class OkHttpUtils {
                      */
                     String fileCategory = filePath.substring(0, filePath.lastIndexOf(File.separator));
                     File category = new File(fileCategory);
-                    if (category.exists()) {
+                    if (!category.exists()) {
                         category.mkdirs();
                     }
                     /**
