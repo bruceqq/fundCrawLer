@@ -16,4 +16,6 @@ public class CrawlerConfig {
     private String cninfoDownloadUrl;
     @Value("${tiantian.stockAnnualReport}")
     private String tiantianStockAnnualReport;
+    @Value("${tiantian.stockholder}")
+    private String tiantianStockholder;
 }

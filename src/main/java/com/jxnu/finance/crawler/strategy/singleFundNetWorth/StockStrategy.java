@@ -2,6 +2,7 @@ package com.jxnu.finance.crawler.strategy.singleFundNetWorth;
 
 
 import com.jxnu.finance.crawler.component.ReportDownLoadService;
+import com.jxnu.finance.crawler.component.StockPositionService;
 import com.jxnu.finance.store.entity.fund.Fund;
 import com.jxnu.finance.store.entity.fund.FundNetWorth;
 import com.jxnu.finance.store.entity.fund.FundStock;
@@ -35,6 +36,8 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
     private String stockUrl;
     @Autowired
     private ReportDownLoadService reportDownLoadService;
+    @Autowired
+    private StockPositionService stockPositionService;
 
     @PostConstruct
     public void init() {
@@ -55,7 +58,8 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
             List<StockExtra> stockExtras = new ArrayList<StockExtra>();
             for (FundStock fundStock : stocks) {
                 StockExtra stockExtra = PopBeanUtils.copyProperties(fundStock, StockExtra.class);
-                reportDownLoadService.download(stockExtra.getStockCode());
+                //reportDownLoadService.download(stockExtra.getStockCode());
+                //stockPositionService.parse(stockExtra.getStockCode());
                 stockExtras.add(stockExtra);
             }
             if (stockExtras.isEmpty()) continue;

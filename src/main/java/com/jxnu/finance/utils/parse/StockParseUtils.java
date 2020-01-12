@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.jxnu.finance.config.enmu.UrlEnmu;
 import com.jxnu.finance.httpRest.model.RestModel.StockIndicator;
 import com.jxnu.finance.store.entity.fund.FundStock;
+import com.jxnu.finance.store.entity.stock.StockPosition;
 import com.jxnu.finance.store.entity.stock.StockiftBean;
 import com.jxnu.finance.utils.CacheUtils;
 import com.jxnu.finance.utils.CalculateUtil;
@@ -247,6 +248,12 @@ public class StockParseUtils {
         return stockIndicator;
     }
 
+    /**
+     * 股票分红
+     *
+     * @param url
+     * @param fundStock
+     */
     public static void shareOut(String url, FundStock fundStock) {
         if (StringUtils.isBlank(url)) {
             return;
@@ -275,6 +282,59 @@ public class StockParseUtils {
             } catch (Exception e) {
             }
         }
+    }
+
+    public static List<StockPosition> institutionalPosition(String url, String stockCode, String stockName, List<String> keywords) {
+        List<StockPosition> stockPositions = new ArrayList();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("url", "PCF10/RptTopTenCirculationShareholders");
+        params.put("type", "post");
+        JSONObject postData = new JSONObject();
+        String newStockCode = stockCode;
+        if (newStockCode.startsWith("00") || newStockCode.startsWith("3")) {
+            newStockCode += ".SZ";
+        } else {
+            newStockCode += ".SH";
+        }
+        postData.put("SecurityCode", newStockCode);
+        params.put("postData", postData.toJSONString());
+        params.put("remove", "shareholderRank,shareholderProperty,sharesChangeRatio");
+        Map<String, String> head = new HashMap<String, String>();
+        String body = OkHttpUtils.post(params, head, url);
+        if (StringUtils.isNotBlank(body)) {
+            JSONArray jsonArray = JSONArray.parseArray(body);
+            if (CollectionUtils.isEmpty(jsonArray)) {
+                return stockPositions;
+            }
+            for (Object stockPositionObject : jsonArray) {
+                Boolean flag = false;
+                StockPosition stockPosition = new StockPosition();
+                stockPosition.setStockCode(stockCode);
+                stockPosition.setStockName(stockName);
+                JSONObject stockPositionJson = (JSONObject) stockPositionObject;
+                String shareholderName = stockPositionJson.getString("shareholderName");
+                for (String keyword : keywords) {
+                    if (shareholderName.contains(keyword)) {
+                        flag = true;
+                        continue;
+                    }
+                }
+                stockPosition.setInstitutional(shareholderName);
+                stockPosition.setShareChange(stockPositionJson.getString("sharesChange"));
+                stockPosition.setRatio(stockPositionJson.getDouble("sharesRate"));
+                String shareholderDate = stockPositionJson.getString("shareholderDate");
+                if (StringUtils.isBlank(shareholderDate) || shareholderDate.length() < 9) {
+                    continue;
+                }
+                shareholderDate = shareholderDate.substring(0, 9);
+                shareholderDate = shareholderDate.replaceAll("/", "-");
+                stockPosition.setTime(shareholderDate);
+                if (flag) {
+                    stockPositions.add(stockPosition);
+                }
+            }
+        }
+        return stockPositions;
     }
 
 

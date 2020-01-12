@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stockPosition">
+    <resultMap id="stockExtraMap" type="com.jxnu.finance.store.entity.stock.StockPosition">
+        <result property="institutional" column="institutional"/>
+        <result property="time" column="time"/>
+        <result property="stockCode" column="stock_code"/>
+        <result property="stockName" column="stock_name"/>
+        <result property="ratio" column="ratio"/>
+        <result property="createTime" column="create_time"/>
+        <result property="modifyTime" column="modify_time"/>
+        <result property="shareChange" column="share_change"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="java.util.List">
+        INSERT ignore into tbl_stock_Institutional_position(
+        institutional,
+        time,
+        stock_code,
+        stock_name,
+        ratio,
+        create_time,
+        modify_time,
+        share_change
+        ) VALUES
+        <foreach collection="list" separator="," item="stockExtra">
+            (
+            #{stockExtra.institutional},
+            #{stockExtra.time},
+            #{stockExtra.stockCode},
+            #{stockExtra.stockName},
+            #{stockExtra.ratio},
+            now(),
+            now(),
+            #{stockExtra.shareChange}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        stock_name=VALUES(stock_name),
+        ratio=VALUES(ratio),
+        share_change=VALUES(share_change)
+    </insert>
+</mapper>
