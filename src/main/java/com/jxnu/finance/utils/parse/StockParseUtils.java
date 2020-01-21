@@ -56,6 +56,11 @@ public class StockParseUtils {
                  * 股票代码
                  */
                 String stockCode = stockCodeElement.text();
+                if (StringUtils.isBlank(stockCode)
+                    || stockCode.contains("HK")
+                    || stockCode.contains("US")) {
+                    continue;
+                }
                 if (CacheUtils.get(stockCode, null) != null) {
                     continue;
                 }
