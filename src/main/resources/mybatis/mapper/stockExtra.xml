@@ -19,6 +19,7 @@
         <result property="totalShare" column="total_share"/>
         <result property="shareOut" column="share_out"/>
         <result property="shareOutRatio" column="share_out_ratio"/>
+        <result property="quarter" column="quarter"/>
     </resultMap>
 
     <insert id="insert" parameterType="java.util.List">
@@ -39,7 +40,8 @@
         price,
         total_share,
         share_out,
-        share_out_ratio
+        share_out_ratio,
+        quarter
         ) VALUES
         <foreach collection="list" separator="," item="stockExtra">
             (
@@ -59,7 +61,8 @@
             #{stockExtra.price},
             #{stockExtra.totalShare},
             #{stockExtra.shareOut},
-            #{stockExtra.shareOutRatio}
+            #{stockExtra.shareOutRatio},
+            #{stockExtra.quarter}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -78,7 +81,8 @@
         create_time=VALUES(create_time),
         total_share=VALUES(total_share),
         share_out=VALUES(share_out),
-        share_out_ratio=VALUES(share_out_ratio)
+        share_out_ratio=VALUES(share_out_ratio),
+        quarter=VALUES(quarter)
     </insert>
 
 

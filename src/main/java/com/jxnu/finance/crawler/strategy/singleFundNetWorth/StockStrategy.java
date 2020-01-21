@@ -58,8 +58,8 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
             List<StockExtra> stockExtras = new ArrayList<StockExtra>();
             for (FundStock fundStock : stocks) {
                 StockExtra stockExtra = PopBeanUtils.copyProperties(fundStock, StockExtra.class);
-                //reportDownLoadService.download(stockExtra.getStockCode());
-                //stockPositionService.parse(stockExtra.getStockCode());
+                reportDownLoadService.download(stockExtra.getStockCode());
+                stockPositionService.parse(stockExtra.getStockCode());
                 stockExtras.add(stockExtra);
             }
             if (stockExtras.isEmpty()) continue;

@@ -64,15 +64,20 @@ public class StockParseUtils {
                  */
                 String newStockUrl = stockUrl;
                 String oldStockUrl = "http://push2.eastmoney.com/api/qt/slist/get?spt=1&np=3&fltt=2&invt=2&fields=f9,f12,f13,f14,f20,f23,f37,f45,f49,f134,f135,f129,f1000,f2000,f3000&ut=bd1d9ddb04089700cf9c27f6f7426281&secid=";
+                String stockJdUrl = "http://push2.eastmoney.com/api/qt/stock/get?ut=fa5fd1943c7b386f172d6893dbfba10b&invt=2&fltt=2&fields=f62&secid=";
                 if (stockCode.startsWith("00") || stockCode.startsWith("3")) {
                     newStockUrl = stockUrl.replace("#", "sz" + stockCode);
                     oldStockUrl += "0." + stockCode;
+                    stockJdUrl += "0." + stockCode;
                 } else {
                     newStockUrl = stockUrl.replace("#", "sh" + stockCode);
                     oldStockUrl += "1." + stockCode;
+                    stockJdUrl += "1." + stockCode;
                 }
-                StockIndicator stockIndicator = parseEastMoney(oldStockUrl);
-                if (stockIndicator != null) BeanUtils.copyProperties(stockIndicator, stock);
+                StockIndicator stockIndicator = parseEastMoney(oldStockUrl, stockJdUrl);
+                if (stockIndicator != null) {
+                    BeanUtils.copyProperties(stockIndicator, stock);
+                }
                 /**
                  * 分红
                  */
@@ -187,7 +192,7 @@ public class StockParseUtils {
      * @param url
      * @return
      */
-    private static StockIndicator parseEastMoney(String url) {
+    private static StockIndicator parseEastMoney(String url, String stockJdUrl) {
         Double totalMarketValue;
         Double netWorth;
         Double netProfit;
@@ -245,6 +250,19 @@ public class StockParseUtils {
         stockIndicator.setNetInterestRate(netInterestRate.toString());
         stockIndicator.setRoe(roe.toString());
         stockIndicator.setSubject(subject);
+        /**
+         * 季度
+         */
+        response = OkHttpUtils.parseToString(stockJdUrl);
+        if (StringUtils.isNotBlank(response)) {
+            json = (JSONObject) JSONObject.parse(response);
+            if (json != null) {
+                dataJson = json.getJSONObject("data");
+                if (dataJson != null) {
+                    stockIndicator.setQuarter(dataJson.getInteger("f62"));
+                }
+            }
+        }
         return stockIndicator;
     }
 
@@ -254,6 +272,7 @@ public class StockParseUtils {
      * @param url
      * @param fundStock
      */
+
     public static void shareOut(String url, FundStock fundStock) {
         if (StringUtils.isBlank(url)) {
             return;
@@ -314,7 +333,8 @@ public class StockParseUtils {
                 JSONObject stockPositionJson = (JSONObject) stockPositionObject;
                 String shareholderName = stockPositionJson.getString("shareholderName");
                 for (String keyword : keywords) {
-                    if (shareholderName.contains(keyword)) {
+                    if (shareholderName.contains(keyword) && !shareholderName.contains("公司")
+                        || shareholderName.contains("中央")) {
                         flag = true;
                         continue;
                     }

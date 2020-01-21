@@ -28,4 +28,5 @@ public class StockExtra {
     private String totalShare;         //总份额
     private String shareOut;           //股息
     private String shareOutRatio;      //股息率
+    private int quarter;               //季度
 }

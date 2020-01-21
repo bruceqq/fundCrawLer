@@ -26,9 +26,11 @@ public class StockPositionService {
     public void init() {
         keywords.add("社保");
         keywords.add("高毅");
-        keywords.add("高领");
-        keywords.add("香港结算");
+        keywords.add("高瓴");
+        keywords.add("中央");
+        keywords.add("香港");
         keywords.add("股通");
+        keywords.add("冯柳");
     }
 
     @Autowired

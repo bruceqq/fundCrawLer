@@ -77,7 +77,7 @@ public class ReportDownLoadService {
                 subjectName = stockExtra.getSubject();
             }
             String adjunctUrl = announcementJson.getString("adjunctUrl");
-            String filePath = crawlerConfig.getAnnualReportFilePath() + File.separator + subjectName + File.separator + stockName + File.separator + announcementTitle;
+            String filePath = crawlerConfig.getAnnualReportFilePath() + File.separator + subjectName + File.separator + stockName + File.separator + announcementTitle+".pdf";
             File file = new File(filePath);
             if (file.exists()) {
                 continue;
