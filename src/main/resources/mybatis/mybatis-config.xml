@@ -15,6 +15,7 @@
         <mapper resource="mybatis/mapper/mail.xml"/>
         <mapper resource="mybatis/mapper/stockExtra.xml"/>
         <mapper resource="mybatis/mapper/stockPosition.xml"/>
+        <mapper resource="mybatis/mapper/stockMark.xml"/>
         <mapper resource="mybatis/mapper/strategyCrontab.xml"/>
         <mapper resource="mybatis/mapper/strategyCrontabAnalyze.xml"/>
         <mapper resource="mybatis/mapper/strategyCrontabSell.xml"/>

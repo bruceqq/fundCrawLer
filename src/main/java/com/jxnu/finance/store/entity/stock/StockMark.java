@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 @Getter
 @ToString
-public class StockExtra {
+public class StockMark {
     private String stockCode;
     private String stockName;
     private String pe;
@@ -25,8 +25,9 @@ public class StockExtra {
     private String roe;                //ROE
     private String subject;            //行业
     private String price;
+    private String futurePrice;        //未来价格
     private String totalShare;         //总份额
     private String shareOut;           //股息
     private String shareOutRatio;      //股息率
-    private Integer quarter;               //季度
+    private int quarter;               //季度
 }

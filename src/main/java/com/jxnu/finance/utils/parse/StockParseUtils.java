@@ -7,10 +7,7 @@ import com.jxnu.finance.httpRest.model.RestModel.StockIndicator;
 import com.jxnu.finance.store.entity.fund.FundStock;
 import com.jxnu.finance.store.entity.stock.StockPosition;
 import com.jxnu.finance.store.entity.stock.StockiftBean;
-import com.jxnu.finance.utils.CacheUtils;
-import com.jxnu.finance.utils.CalculateUtil;
-import com.jxnu.finance.utils.NumberUtil;
-import com.jxnu.finance.utils.OkHttpUtils;
+import com.jxnu.finance.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -198,14 +195,14 @@ public class StockParseUtils {
      * @return
      */
     private static StockIndicator parseEastMoney(String url, String stockJdUrl) {
-        Double totalMarketValue;
-        Double netWorth;
-        Double netProfit;
-        Double grossProfitMargin;
-        Double netInterestRate;
-        Double pe;
-        Double pb;
-        Double roe;
+        Double totalMarketValue = 0.0;
+        Double netWorth = 0.0;
+        Double netProfit = 0.0;
+        Double grossProfitMargin = 0.0;
+        Double netInterestRate = 0.0;
+        Double pe = 0.0;
+        Double pb = 0.0;
+        Double roe = 0.0;
         String subject = "";
         StockIndicator stockIndicator = new StockIndicator();
         String response = OkHttpUtils.parseToString(url);
@@ -230,14 +227,25 @@ public class StockParseUtils {
         if (stockInfo == null || industryInfo == null) {
             return stockIndicator;
         }
+        if (!StringUtil.isBank(stockInfo.getString("f20"))) {
+            totalMarketValue = NumberUtil.calculate(stockInfo.getBigDecimal("f20"));
+        }
+        if (!StringUtil.isBank(stockInfo.getString("f23"))) {
+            pb = stockInfo.getDoubleValue("f23");
+        }
+        if (!StringUtil.isBank(stockInfo.getString("f9"))) {
+            pe = stockInfo.getDoubleValue("f9");
+        }
+        if (!StringUtil.isBank(stockInfo.getString("f135"))) {
+            netWorth = NumberUtil.calculate(stockInfo.getBigDecimal("f135"));
+        }
+        if (!StringUtil.isBank(stockInfo.getString("f45"))) {
+            netProfit = NumberUtil.calculate(stockInfo.getBigDecimal("f45"));
+        }
+        if (!StringUtil.isBank(stockInfo.getString("f14"))) {
+            subject = industryInfo.getString("f14");
+        }
 
-        totalMarketValue = NumberUtil.calculate(stockInfo.getBigDecimal("f20"));
-
-        pb = stockInfo.getDoubleValue("f23");
-        pe = stockInfo.getDoubleValue("f9");
-        netWorth = NumberUtil.calculate(stockInfo.getBigDecimal("f135"));
-        netProfit = NumberUtil.calculate(stockInfo.getBigDecimal("f45"));
-        subject = industryInfo.getString("f14");
         if (StringUtils.isNotBlank(subject) &&
             subject.contains("(行业平均)")) {
             subject = subject.replace("(行业平均)", "");

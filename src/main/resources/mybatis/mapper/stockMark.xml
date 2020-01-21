@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="stockExtra">
-    <resultMap id="stockExtraMap" type="com.jxnu.finance.store.entity.stock.StockExtra">
+<mapper namespace="stockMark">
+    <resultMap id="stockMarkMap" type="com.jxnu.finance.store.entity.stock.StockMark">
         <result property="stockCode" column="stock_code"/>
         <result property="stockName" column="stock_name"/>
         <result property="stockUrl" column="stock_url"/>
@@ -16,6 +16,7 @@
         <result property="roe" column="roe"/>
         <result property="subject" column="subject"/>
         <result property="price" column="price"/>
+        <result property="futurePrice" column="future_price"/>
         <result property="totalShare" column="total_share"/>
         <result property="shareOut" column="share_out"/>
         <result property="shareOutRatio" column="share_out_ratio"/>
@@ -23,7 +24,7 @@
     </resultMap>
 
     <insert id="insert" parameterType="java.util.List">
-        INSERT ignore into tbl_stock_extra(
+        INSERT ignore into tbl_stock_mark(
         stock_code,
         stock_name,
         create_time,
@@ -41,7 +42,8 @@
         total_share,
         share_out,
         share_out_ratio,
-        quarter
+        quarter,
+        future_price
         ) VALUES
         <foreach collection="list" separator="," item="stockExtra">
             (
@@ -62,7 +64,8 @@
             #{stockExtra.totalShare},
             #{stockExtra.shareOut},
             #{stockExtra.shareOutRatio},
-            #{stockExtra.quarter}
+            #{stockExtra.quarter},
+            #{stockExtra.futurePrice}
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
@@ -82,31 +85,7 @@
         total_share=VALUES(total_share),
         share_out=VALUES(share_out),
         share_out_ratio=VALUES(share_out_ratio),
-        quarter=VALUES(quarter)
+        quarter=VALUES(quarter),
+        future_price=VALUES(future_price)
     </insert>
-
-
-    <select id="selectOne" resultMap="stockExtraMap" parameterType="java.util.HashMap">
-        SELECT
-        *
-        FROM tbl_stock_extra
-        <where>
-            <if test="stockCode != null and stockCode != ''">
-                and stock_code = #{stockCode}
-            </if>
-        </where>
-    </select>
-
-
-    <select id="selectMulti" resultMap="stockExtraMap" parameterType="java.util.HashMap">
-        SELECT
-        *
-        FROM tbl_stock_extra
-        <where>
-            <if test="stockCode != null and stockCode != ''">
-                and stock_code = #{stockCode}
-            </if>
-        </where>
-    </select>
-
 </mapper>
