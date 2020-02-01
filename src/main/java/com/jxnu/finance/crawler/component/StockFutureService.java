@@ -9,6 +9,7 @@ import com.jxnu.finance.utils.NumberUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +17,8 @@ public class StockFutureService {
     @Autowired
     private StockMarkStore stockMarkStore;
 
+
+    @Async
     public void future(StockExtra stockExtra) {
         if (stockExtra == null) {
             return;
@@ -59,7 +62,7 @@ public class StockFutureService {
         /**
          * 价格翻倍
          */
-        if (ratio > 2 && estimateRoe > 15) {
+        if (ratio > 1.7 && estimateRoe > 10) {
             stockMarkStore.insert(Lists.newArrayList(stockMark));
         }
     }

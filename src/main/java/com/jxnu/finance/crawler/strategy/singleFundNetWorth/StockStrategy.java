@@ -13,6 +13,7 @@ import com.jxnu.finance.utils.parse.StockParseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +42,7 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
     }
 
     @Override
+    @Async
     public void handler(List<FundNetWorth> fundNetWorthList, Fund fund) {
         String fundCode = "";
         if (fund == null || StringUtils.isBlank(fundCode = fund.getCode())) return;
