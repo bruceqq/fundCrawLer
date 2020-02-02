@@ -1,6 +1,7 @@
 package com.jxnu.finance.crawler.strategy.singleFundNetWorth;
 
 
+import com.jxnu.finance.crawler.strategy.multiFundNetWorth.StockExtraStrategy;
 import com.jxnu.finance.store.entity.fund.Fund;
 import com.jxnu.finance.store.entity.fund.FundNetWorth;
 import com.jxnu.finance.store.entity.fund.FundStock;
@@ -13,7 +14,6 @@ import com.jxnu.finance.utils.parse.StockParseUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -38,12 +38,14 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
 
     @PostConstruct
     public void init() {
-        super.next = stockExtraStrategy;
+        super.next = null;
     }
 
     @Override
-    @Async
     public void handler(List<FundNetWorth> fundNetWorthList, Fund fund) {
+        /**
+         * 获取基金重仓股票相关信息
+         */
         String fundCode = "";
         if (fund == null || StringUtils.isBlank(fundCode = fund.getCode())) return;
         List<String> times = TimeUtil.latestYear(5);
@@ -61,6 +63,13 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
             if (stockExtras.isEmpty()) continue;
             stockExtraStore.insert(stockExtras);
         }
+        /**
+         * 获取完成股票的相关数据、重新分析股票相关指标及数据
+         */
+        stockExtraStrategy.handler();
+        /**
+         * 执行下一个策略
+         */
         if (super.next != null) {
             super.handler(fundNetWorthList, fund);
         }

@@ -129,7 +129,7 @@ public class OkHttpUtils {
      * @throws IOException
      */
     private static Response call(Object builder) throws IOException {
-        RateLimiter rateLimiter = RateLimiter.create(50.0);
+        RateLimiter rateLimiter = RateLimiter.create(1000.0);
         if (rateLimiter.tryAcquire()) {
             rateLimiter.acquire();
             if (builder instanceof Request) {

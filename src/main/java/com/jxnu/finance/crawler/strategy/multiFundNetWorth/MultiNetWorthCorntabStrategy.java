@@ -22,7 +22,7 @@ import java.util.*;
  * Created by coder on 2017/11/11.
  */
 @Component("multiNetWorthCorntabStrategy")
-public class MultiNetWorthCorntabStrategy extends BaseMultiNetWorthStrategy {
+public class MultiNetWorthCorntabStrategy extends AfterHandlerNetWorthStrategy {
     @Autowired
     private StrategyCrontabStore strategyCrontabStore;
     @Autowired
@@ -30,7 +30,7 @@ public class MultiNetWorthCorntabStrategy extends BaseMultiNetWorthStrategy {
     @Autowired
     private StrategyPurchaseStore purchaseStore;
     @Resource(name = "multiNetWorthAnalyzeStrategy")
-    private BaseMultiNetWorthStrategy multiNetWorthStrategy;
+    private AfterHandlerNetWorthStrategy multiNetWorthStrategy;
     private final static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @PostConstruct

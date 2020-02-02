@@ -19,13 +19,13 @@ import java.util.TreeSet;
  * Created by coder on 2017/11/11.
  */
 @Component("multiNetWorthRankStrategy")
-public class MultiNetWorthRankStrategy extends BaseMultiNetWorthStrategy {
+public class MultiNetWorthRankStrategy extends AfterHandlerNetWorthStrategy {
     private final static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final static Integer dateNum = 20;
     @Autowired
     private FundRankStore fundRankStore;
     @Resource(name = "multiNetWorthCorntabStrategy")
-    private BaseMultiNetWorthStrategy corntabStategy;
+    private AfterHandlerNetWorthStrategy corntabStategy;
 
     @PostConstruct
     public void init() {

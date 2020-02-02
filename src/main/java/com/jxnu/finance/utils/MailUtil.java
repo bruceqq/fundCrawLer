@@ -1,20 +1,18 @@
 package com.jxnu.finance.utils;
 
-import com.jxnu.finance.store.entity.fund.Fund;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
 /**
  * @author shoumiao_yao
- * @date 2016-10-09
+ * @date 2016-10-09ØØØ
  */
 public class MailUtil {
     private final static Logger logger= LoggerFactory.getLogger(MailUtil.class);
-    public static void sendmail(String title,Set<Fund> funds)  {
+    public static void sendmail(String title,String text)  {
         try {
             //发送简单邮件
             SimpleEmail email = new SimpleEmail();
@@ -31,11 +29,6 @@ public class MailUtil {
             //设置主题的字符集为UTF-8
             email.setSubject(title);
             email.buildMimeMessage();
-            String text="<html><head></head><body>";
-            for(Fund fund: funds){
-                text += fund.getName() + ": <a href=\"http://finance.eastmoney.com/" + fund.getCode() + ".html?spm=search\">" + fund.getCode() + "</a></br>";
-            }
-            text+="</body></html>";
             email.getMimeMessage().setContent(text,"text/html;charset=utf-8");
             email.sendMimeMessage();
         } catch (Exception e) {

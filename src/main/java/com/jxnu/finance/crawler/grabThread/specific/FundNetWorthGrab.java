@@ -1,16 +1,13 @@
 package com.jxnu.finance.crawler.grabThread.specific;
 
 import com.jxnu.finance.crawler.strategy.BeforeHandlerFundNetWorth.BeforeHandlerNetWorthStrategy;
-import com.jxnu.finance.crawler.strategy.multiFundNetWorth.BaseMultiNetWorthStrategy;
+import com.jxnu.finance.crawler.strategy.multiFundNetWorth.AfterHandlerNetWorthStrategy;
 import com.jxnu.finance.crawler.strategy.singleFundNetWorth.BaseSingleNetWorthStrategy;
 import com.jxnu.finance.store.entity.fund.Fund;
 import com.jxnu.finance.store.entity.fund.FundNetWorth;
-import com.jxnu.finance.store.entity.fund.FundShareOut;
 import com.jxnu.finance.store.mapper.FundNetWorthStore;
 import com.jxnu.finance.store.mapper.FundShareOutStore;
 import com.jxnu.finance.store.mapper.FundStore;
-import com.jxnu.finance.utils.parse.ParseUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.Executors;
 
 /**
  * Created by coder on 2016/7/2.
@@ -39,40 +36,99 @@ public class FundNetWorthGrab extends Grab {
     private FundNetWorthStore fundNetWorthStore;
     @Autowired
     private FundShareOutStore fundShareOutStore;
-    @Resource(name = "stockExtraStrategy")
-    private BaseSingleNetWorthStrategy fundNetWorthStrategy;
-    @Resource(name = "multiNetWorthRankStrategy")
-    private BaseMultiNetWorthStrategy multiNetWorthStrategy;
+    /**
+     * 基金净值获取前 策略执行
+     */
     @Resource(name = "rankBeforeHandlerStrategy")
     private BeforeHandlerNetWorthStrategy beforeHandlerNetWorthStrategy;
+    /**
+     * 基金净值获取时 策略执行
+     */
+    @Resource(name = "stockStrategy")
+    private BaseSingleNetWorthStrategy singleNetWorthStrategy;
+    /**
+     * 所有基金获取净值之后 策略执行
+     */
+    @Resource(name = "stockExtraStrategy")
+    private AfterHandlerNetWorthStrategy afterHandlerNetWorthStrategy;
+
 
     public void handler(Integer num) {
-        List<Fund> fundList = fundStore.selectMulti("");
         if (num != -1) {
             /**
              * 基金净值获取前 策略执行
              */
-            //beforeHandlerNetWorthStrategy.handler();
-            List<FundNetWorth> fundNetWorthList = new ArrayList<FundNetWorth>();
+            Executors.newSingleThreadExecutor().submit(new BeforeRunnable(beforeHandlerNetWorthStrategy));
+            Executors.newSingleThreadExecutor().submit(new SingleRunnable(fundStore,singleNetWorthStrategy));
+            Executors.newSingleThreadExecutor().submit(new AfterRunnable(afterHandlerNetWorthStrategy));
+        }
+    }
+
+    /**
+     * 基金净值获取前 执行策略线程
+     */
+    class BeforeRunnable implements Runnable {
+        private BeforeHandlerNetWorthStrategy beforeHandlerNetWorthStrategy;
+
+        BeforeRunnable(BeforeHandlerNetWorthStrategy beforeHandlerNetWorthStrategy) {
+            this.beforeHandlerNetWorthStrategy = beforeHandlerNetWorthStrategy;
+        }
+
+        @Override
+        public void run() {
+            beforeHandlerNetWorthStrategy.handler();
+        }
+    }
+
+
+    /**
+     * 基金净值获取中 执行策略线程
+     */
+    class SingleRunnable implements Runnable {
+        private FundStore fundStore;
+        private BaseSingleNetWorthStrategy singleNetWorthStrategy;
+
+        SingleRunnable(FundStore fundStore, BaseSingleNetWorthStrategy singleNetWorthStrategy) {
+            this.fundStore = fundStore;
+            this.singleNetWorthStrategy = singleNetWorthStrategy;
+        }
+
+        @Override
+        public void run() {
+            List<Fund> fundList = this.fundStore.selectMulti("");
             for (Fund fund : fundList) {
                 try {
                     /**
                      * 基金净值获取
                      */
-                    //fundNetWorthList = fundNetWorth(num, fund);
+                    List<FundNetWorth> fundNetWorthList = new ArrayList<FundNetWorth>();
+                    //List<FundNetWorth> fundNetWorthList = fundNetWorth(num, fund);
                     /**
                      * 单个基金净值获取后 策略执行
                      */
-                    fundNetWorthStrategy.handler(fundNetWorthList, fund);
+                    singleNetWorthStrategy.handler(fundNetWorthList, fund);
                 } catch (Exception e) {
                     logger.error("error:{}", ExceptionUtils.getStackTrace(e));
                 }
             }
         }
-        /**
-         * 所有基金净值获取后 策略执行
-         */
-        multiNetWorthStrategy.handler();
+    }
+
+
+    /**
+     * 基金净值获取后 执行策略线程
+     */
+    class AfterRunnable implements Runnable {
+        private AfterHandlerNetWorthStrategy afterHandlerNetWorthStrategy;
+
+        AfterRunnable(AfterHandlerNetWorthStrategy afterHandlerNetWorthStrategy) {
+            this.afterHandlerNetWorthStrategy = afterHandlerNetWorthStrategy;
+        }
+
+        @Override
+        public void run() {
+            afterHandlerNetWorthStrategy.handler();
+        }
     }
 
 
@@ -80,7 +136,7 @@ public class FundNetWorthGrab extends Grab {
      * 基金净值
      *
      * @return
-     */
+     *//*
     private List<FundNetWorth> fundNetWorth(Integer num, Fund fund) {
         Random random = new Random(1000);
         List<FundNetWorth> fundNetWorths = new ArrayList<FundNetWorth>();
@@ -104,11 +160,11 @@ public class FundNetWorthGrab extends Grab {
         return fundNetWorthList;
     }
 
-    /**
+    *//**
      * 基金分红
      *
      * @param code
-     */
+     *//*
     private void insetShareOuts(String code) {
         List<FundShareOut> fundShareOuts = new ArrayList<FundShareOut>();
         List<String> shareOuts = ParseUtils.parseFundShareOut(fundUrl.replace("#", code));
@@ -121,5 +177,5 @@ public class FundNetWorthGrab extends Grab {
         }
         if (shareOuts.isEmpty()) return;
         fundShareOutStore.insert(fundShareOuts);
-    }
+    }*/
 }

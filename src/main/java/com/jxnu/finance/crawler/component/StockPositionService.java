@@ -8,7 +8,6 @@ import com.jxnu.finance.store.mapper.StockExtraStore;
 import com.jxnu.finance.store.mapper.StockPositionStore;
 import com.jxnu.finance.utils.parse.StockParseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -41,7 +40,6 @@ public class StockPositionService {
     @Autowired
     private CrawlerConfig crawlerConfig;
 
-    @Async
     public void parse(String stockCode) {
         String stockName = "";
         StockExtra stockExtra = stockExtraStore.selectOne(stockCode);

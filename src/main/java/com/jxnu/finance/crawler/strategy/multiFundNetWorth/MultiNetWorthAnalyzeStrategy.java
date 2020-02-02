@@ -24,7 +24,7 @@ import java.util.*;
  * Created by coder on 2017/11/11.
  */
 @Component("multiNetWorthAnalyzeStrategy")
-public class MultiNetWorthAnalyzeStrategy extends BaseMultiNetWorthStrategy {
+public class MultiNetWorthAnalyzeStrategy extends AfterHandlerNetWorthStrategy {
     private final static Logger logger = LoggerFactory.getLogger(MultiNetWorthAnalyzeStrategy.class);
     private final static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired

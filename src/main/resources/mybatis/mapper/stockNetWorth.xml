@@ -14,7 +14,6 @@
         time,
         stock_name,
         stock_net_worth,
-        create_time,
         modify_time
         ) VALUES
         <foreach collection="list" separator="," item="stockNetWorth">
@@ -23,14 +22,12 @@
             #{stockNetWorth.time},
             #{stockNetWorth.stockName},
             #{stockNetWorth.stockNetWorth},
-            now(),
             now()
             )
         </foreach>
         ON DUPLICATE KEY UPDATE
         stock_name=VALUES(stock_name),
         stock_net_worth=VALUES(stock_net_worth),
-        create_time=VALUES(create_time),
         modify_time=VALUES(modify_time)
     </insert>
 </mapper>

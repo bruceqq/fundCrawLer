@@ -9,7 +9,6 @@ import com.jxnu.finance.store.mapper.StockNetWorthStore;
 import com.jxnu.finance.utils.OkHttpUtils;
 import com.jxnu.finance.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,8 +24,6 @@ public class StockNetWorthService {
     @Autowired
     private StockExtraStore stockExtraStore;
 
-
-   @Async
     public void netWorth(String stockCode) {
         if (StringUtil.isBank(stockCode)) {
             return;

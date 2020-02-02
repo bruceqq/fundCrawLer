@@ -10,7 +10,6 @@ import com.jxnu.finance.store.mapper.StockExtraStore;
 import com.jxnu.finance.utils.OkHttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -29,7 +28,6 @@ public class ReportDownLoadService {
      *
      * @param stockCode
      */
-    @Async
     public void download(String stockCode) {
         /**
          * 参数

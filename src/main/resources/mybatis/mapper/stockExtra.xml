@@ -107,6 +107,7 @@
                 and stock_code = #{stockCode}
             </if>
         </where>
+        order by id desc
     </select>
 
 </mapper>
