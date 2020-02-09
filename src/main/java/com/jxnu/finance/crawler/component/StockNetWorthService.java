@@ -6,15 +6,12 @@ import com.jxnu.finance.store.entity.stock.StockExtra;
 import com.jxnu.finance.store.entity.stock.StockNetWorth;
 import com.jxnu.finance.store.mapper.StockExtraStore;
 import com.jxnu.finance.store.mapper.StockNetWorthStore;
-import com.jxnu.finance.utils.OkHttpUtils;
-import com.jxnu.finance.utils.StringUtil;
+import com.jxnu.finance.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public class StockNetWorthService {
@@ -43,7 +40,21 @@ public class StockNetWorthService {
         if (jsonArray == null || jsonArray.isEmpty()) {
             return;
         }
+        Double maxNetWorth = maxNetWorth(stockCode);
         List<StockNetWorth> stockNetWorths = new ArrayList<StockNetWorth>();
+        JSONObject lastNetWorthJson = jsonArray.getJSONObject(0);
+        if (maxNetWorth != null && lastNetWorthJson != null) {
+            Double lastNetWorth = lastNetWorthJson.getDoubleValue("F002N");
+            Double divide = CalculateUtil.divide(maxNetWorth - lastNetWorth, maxNetWorth, 2);
+            if (divide > 0.3) {
+                StringBuffer stringBuffer = new StringBuffer();
+                stringBuffer.append("<html><head></head><body>");
+                stringBuffer.append(stockExtra.getStockName() + ": <a href=\"" + stockExtra.getStockUrl() + "\">" + "下降比例:" + divide);
+                stringBuffer.append("</body></html>");
+                MailUtil.sendmail(stockExtra.getStockName() + "净值下降通知", stringBuffer.toString());
+            }
+        }
+
         for (Object object : jsonArray) {
             StockNetWorth stockNetWorth = new StockNetWorth();
             JSONObject jsonObject = (JSONObject) object;
@@ -54,5 +65,23 @@ public class StockNetWorthService {
             stockNetWorths.add(stockNetWorth);
         }
         stockNetWorthStore.insert(stockNetWorths);
+    }
+
+
+    /**
+     * 计算3个月内最大净值
+     *
+     * @param stockCode
+     * @return
+     */
+    public Double maxNetWorth(String stockCode) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String endTime = TimeUtil.current(simpleDateFormat);
+        String startTime = TimeUtil.current(simpleDateFormat, Calendar.DAY_OF_YEAR, -90);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("startTime", startTime);
+        params.put("endTime", endTime);
+        params.put("stockCode", stockCode);
+        return stockNetWorthStore.selectMaxNetWorth(params);
     }
 }

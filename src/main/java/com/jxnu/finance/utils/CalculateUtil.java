@@ -30,10 +30,16 @@ public class CalculateUtil {
      * @param denominator
      * @return
      */
-    public static Float divide(Float molecule, Float denominator,Integer num) {
+    public static Float divide(Float molecule, Float denominator, Integer num) {
         BigDecimal moleculeBig = new BigDecimal(String.valueOf(molecule));
         BigDecimal denominatorBig = new BigDecimal(String.valueOf(denominator));
         return moleculeBig.divide(denominatorBig, num, BigDecimal.ROUND_HALF_EVEN).floatValue();
+    }
+
+    public static Double divide(Double molecule, Double denominator, Integer num) {
+        BigDecimal moleculeBig = new BigDecimal(String.valueOf(molecule));
+        BigDecimal denominatorBig = new BigDecimal(String.valueOf(denominator));
+        return moleculeBig.divide(denominatorBig, num, BigDecimal.ROUND_HALF_EVEN).doubleValue();
     }
 
     /**
@@ -55,7 +61,7 @@ public class CalculateUtil {
 
     public static void main(String[] args) {
         System.out.println(multiply(10.0f, 1 - 0.0015f));
-        System.out.println(divide(12.34f, 3.44f,2));
+        System.out.println(divide(12.34f, 3.44f, 2));
     }
 
 

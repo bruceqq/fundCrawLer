@@ -30,4 +30,20 @@
         stock_net_worth=VALUES(stock_net_worth),
         modify_time=VALUES(modify_time)
     </insert>
+
+    <select id="selectMaxNetWorth" resultType="java.lang.Double" parameterType="java.util.Map">
+        SELECT max(stock_net_worth)
+        from tbl_stock_net_worth
+        <where>
+            <if test="startTime != null and startTime != ''">
+                and time >= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and #{endTime} >= time
+            </if>
+            <if test="stockCode != null and stockCode != ''">
+                and #{stockCode} = stock_code
+            </if>
+        </where>
+    </select>
 </mapper>

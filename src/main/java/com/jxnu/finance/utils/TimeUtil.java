@@ -68,7 +68,7 @@ public class TimeUtil {
                 calendar.setTime(dateFormat.parse(startTime));
                 calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR) + index);
                 if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY ||
-                        calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) continue;
+                    calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) continue;
                 String time = dateFormat.format(calendar.getTime());
                 if (timeSet.contains(time)) continue;
                 sets.add(time);
@@ -120,6 +120,28 @@ public class TimeUtil {
             num -= 1;
         } while (num >= 0);
         return years;
+    }
+
+    /**
+     * 当前时间格式
+     *
+     * @param
+     * @return
+     */
+    public static String current(SimpleDateFormat simpleDateFormat) {
+        return simpleDateFormat.format(new Date());
+    }
+
+    /**
+     * 当前时间格式
+     *
+     * @param
+     * @return
+     */
+    public static String current(SimpleDateFormat simpleDateFormat, int unit, int num) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(unit, calendar.get(unit) + num);
+        return simpleDateFormat.format(calendar.getTime());
     }
 
 

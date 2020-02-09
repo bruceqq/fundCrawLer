@@ -19,10 +19,11 @@ public class MailUtil {
 
             email.setHostName("smtp.qq.com");
             email.setDebug(true);
+            email.setStartTLSEnabled(true);
             email.setSSLOnConnect(true);
 
             //需要邮件发送服务器验证,用户名/密码
-            email.setAuthentication("1247793952@qq.com", "****");
+            email.setAuthentication("1247793952@qq.com", "emsjkmahpdjfhhed");
             email.setFrom("1247793952@qq.com");
             email.addTo("15889326057@163.com");
 
