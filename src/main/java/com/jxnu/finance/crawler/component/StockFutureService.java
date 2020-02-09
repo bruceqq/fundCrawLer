@@ -30,7 +30,7 @@ public class StockFutureService {
         BeanUtils.copyProperties(stockExtra, stockMark);
         if (StringUtils.isBlank(stockExtra.getPrice())
             || StringUtils.isBlank(stockExtra.getTotalShare())
-            || StringUtils.isBlank(stockExtra.getNetProfit())
+            || stockExtra.getNetProfit() != null
             || stockExtra.getQuarter() == null
             || StringUtils.isBlank(stockExtra.getRoe())) {
             return;
@@ -46,7 +46,7 @@ public class StockFutureService {
         /**
          * 预计全年的利润
          */
-        Double estimateNetProfit = NumberUtil.multiply(Double.parseDouble(stockExtra.getNetProfit()), NumberUtil.divide(4.0D, quarter + 0D));
+        Double estimateNetProfit = NumberUtil.multiply(stockExtra.getNetProfit(), NumberUtil.divide(4.0D, quarter + 0D));
         /**
          * 预计三年后的利润
          */

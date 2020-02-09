@@ -69,11 +69,14 @@ public class StockNetWorthService {
      */
     public void mail(StockExtra stockExtra, JSONObject lastNetWorthJson) {
         String stockCode = stockExtra.getStockCode();
+        String stockName = stockExtra.getStockName();
+        Double netProfit = stockExtra.getNetProfit();
+
         /**
          * 邮件次数控制
          */
         Integer count = mailStore.queryMail(stockCode, "1");
-        if (count > 0) {
+        if (count > 0 || stockName.contains("ST") || stockName.contains("退市") || netProfit < 1) {
             return;
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
