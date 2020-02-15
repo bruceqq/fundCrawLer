@@ -256,7 +256,7 @@ public class StockParseUtils {
 
         stockIndicator.setTotalMarketValue(totalMarketValue.toString());
         stockIndicator.setNetWorth(netWorth.toString());
-        stockIndicator.setNetProfit(netProfit.toString());
+        stockIndicator.setNetProfit(netProfit);
         stockIndicator.setPe(pe.toString());
         stockIndicator.setPb(pb.toString());
         stockIndicator.setGrossProfitMargin(grossProfitMargin.toString());

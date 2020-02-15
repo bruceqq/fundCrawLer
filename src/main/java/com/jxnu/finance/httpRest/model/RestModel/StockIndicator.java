@@ -15,7 +15,7 @@ import lombok.ToString;
 public class StockIndicator {
     private String totalMarketValue;   //总市值
     private String netWorth;           //净资产
-    private String netProfit;          //净利润
+    private Double netProfit;          //净利润
     private String grossProfitMargin;  //毛利率
     private String netInterestRate;    //净利率
     private String pe;                 //市盈率

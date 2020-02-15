@@ -81,7 +81,7 @@ public class StockNetWorthService {
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String endTime = TimeUtil.current(simpleDateFormat);
-        String startTime = TimeUtil.current(simpleDateFormat, Calendar.DAY_OF_YEAR, -90);
+        String startTime = TimeUtil.current(simpleDateFormat, Calendar.DAY_OF_YEAR, -180);
         Map<String, String> params = new HashMap<String, String>();
         params.put("startTime", startTime);
         params.put("endTime", endTime);
