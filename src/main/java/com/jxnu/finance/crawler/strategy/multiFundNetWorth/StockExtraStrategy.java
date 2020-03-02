@@ -47,7 +47,10 @@ public class StockExtraStrategy extends AfterHandlerNetWorthStrategy {
         List<StockExtra> stockExtras = stockExtraStore.selectMulti(new HashMap());
         for (StockExtra stockExtra : stockExtras) {
             String stockCode = stockExtra.getStockCode();
-            stockNetWorthService.netWorth(stockCode);
+            try {
+                stockNetWorthService.netWorth(stockCode);
+            } catch (Exception e) {
+            }
             //reportDownLoadService.download(stockCode);
             //stockPositionService.parse(stockCode);
             //stockFutureService.future(stockExtra);

@@ -18,7 +18,7 @@
         where a.code=#{fundCode}
         and a.type=#{type}
         and NOW() >= a.time
-        and  a.time>= ADDDATE(NOW(),INTERVAL -70 DAY)
+        and  a.time>= ADDDATE(NOW(),INTERVAL -5 DAY)
     </select>
 
 

@@ -1,13 +1,13 @@
 package com.jxnu.finance.crawler.strategy.singleFundNetWorth;
 
 
-import com.jxnu.finance.crawler.strategy.multiFundNetWorth.StockExtraStrategy;
 import com.jxnu.finance.store.entity.fund.Fund;
 import com.jxnu.finance.store.entity.fund.FundNetWorth;
 import com.jxnu.finance.store.entity.fund.FundStock;
 import com.jxnu.finance.store.entity.stock.StockExtra;
 import com.jxnu.finance.store.mapper.FundStockStore;
 import com.jxnu.finance.store.mapper.StockExtraStore;
+import com.jxnu.finance.utils.StringUtil;
 import com.jxnu.finance.utils.TimeUtil;
 import com.jxnu.finance.utils.base.PopBeanUtils;
 import com.jxnu.finance.utils.parse.StockParseUtils;
@@ -20,9 +20,11 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Service("stockStrategy")
 public class StockStrategy extends BaseSingleNetWorthStrategy {
+    private static final Pattern pattern = Pattern.compile("^[0-9]\\d*$");
     @Autowired
     private FundStockStore stockStore;
     @Autowired
@@ -33,8 +35,6 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
     private String sylUrl;
     @Value("${tiantian.stockUrl}")
     private String stockUrl;
-    @Autowired
-    private StockExtraStrategy stockExtraStrategy;
 
     @PostConstruct
     public void init() {
@@ -49,24 +49,35 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
         String fundCode = "";
         if (fund == null || StringUtils.isBlank(fundCode = fund.getCode())) return;
         List<String> times = TimeUtil.latestYear(5);
+        List<StockExtra> stockExtras = new ArrayList<StockExtra>();
         for (String time : times) {
             String newUrl = "";
             newUrl = url.replace("#", fundCode).replace("@", time).replace("$", String.valueOf(new Random(5).nextInt()));
             List<FundStock> stocks = StockParseUtils.parseStock(newUrl, fundCode, time, stockUrl);
             if (stocks.isEmpty()) continue;
             stockStore.insert(stocks);
-            List<StockExtra> stockExtras = new ArrayList<StockExtra>();
             for (FundStock fundStock : stocks) {
                 StockExtra stockExtra = PopBeanUtils.copyProperties(fundStock, StockExtra.class);
-                stockExtras.add(stockExtra);
+                String stockCode = stockExtra.getStockCode();
+                if (stockCode.contains(".SZ")) {
+                    stockCode = stockCode.replaceAll(".SZ", "");
+                }
+                if (stockCode.contains(".SH")) {
+                    stockCode = stockCode.replaceAll(".SH", "");
+                }
+                if (pattern.matcher(stockCode).find()
+                    && stockCode.length() == 6
+                    && stockExtra.getTotalMarketValue() != null
+                    && !StringUtil.isBank(stockExtra.getSubject())
+                    && stockExtra.getNetProfit() != null) {
+                    stockExtra.setStockCode(stockCode);
+                    stockExtras.add(stockExtra);
+                }
             }
-            if (stockExtras.isEmpty()) continue;
+        }
+        if (!stockExtras.isEmpty()) {
             stockExtraStore.insert(stockExtras);
         }
-        /**
-         * 获取完成股票的相关数据、重新分析股票相关指标及数据
-         */
-        stockExtraStrategy.handler();
         /**
          * 执行下一个策略
          */

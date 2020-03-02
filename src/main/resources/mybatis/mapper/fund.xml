@@ -30,7 +30,7 @@
                 handler=#{handler}
             </if>
         </where>
-        ORDER BY code DESC
+        ORDER BY code asc
     </select>
 
     <select id="selectOne" resultMap="fundMap" parameterType="java.util.Map">

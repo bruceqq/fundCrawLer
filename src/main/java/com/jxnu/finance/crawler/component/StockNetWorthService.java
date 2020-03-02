@@ -76,7 +76,7 @@ public class StockNetWorthService {
          * 邮件次数控制
          */
         Integer count = mailStore.queryMail(stockCode, "1");
-        if (count > 0 || stockName.contains("ST") || stockName.contains("退市") || netProfit < 1) {
+        if (count > 0 || stockName.contains("ST") || stockName.contains("退市") || netProfit == null || netProfit < 1) {
             return;
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -90,7 +90,7 @@ public class StockNetWorthService {
         if (maxNetWorth != null && lastNetWorthJson != null) {
             Double lastNetWorth = lastNetWorthJson.getDoubleValue("F002N");
             Double divide = CalculateUtil.divide(maxNetWorth - lastNetWorth, maxNetWorth, 2);
-            if (divide > 0.3) {
+            if (divide > 0.2) {
                 StringBuffer stringBuffer = new StringBuffer();
                 stringBuffer.append("<html><head></head><body>");
                 stringBuffer.append(stockExtra.getStockName() + ": <a href=\"" + stockExtra.getStockUrl() + "\">" + "下降比例:" + divide);

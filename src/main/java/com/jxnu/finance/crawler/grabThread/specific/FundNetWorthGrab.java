@@ -59,8 +59,26 @@ public class FundNetWorthGrab extends Grab {
              * 基金净值获取前 策略执行
              */
             Executors.newSingleThreadExecutor().submit(new BeforeRunnable(beforeHandlerNetWorthStrategy));
-            Executors.newSingleThreadExecutor().submit(new SingleRunnable(fundStore,singleNetWorthStrategy));
-            Executors.newSingleThreadExecutor().submit(new AfterRunnable(afterHandlerNetWorthStrategy));
+
+            List<Fund> fundList = this.fundStore.selectMulti("");
+            for (int index = 0; index < fundList.size(); index++) {
+                try {
+                    Fund fund = fundList.get(index);
+                    /**
+                     * 基金净值获取
+                     */
+                    List<FundNetWorth> fundNetWorthList = new ArrayList<FundNetWorth>();
+                    //List<FundNetWorth> fundNetWorthList = fundNetWorth(num, fund);
+                    /**
+                     * 单个基金净值获取后 策略执行
+                     */
+                    singleNetWorthStrategy.handler(fundNetWorthList, fund);
+                } catch (Exception e) {
+                    logger.error("error:{}", ExceptionUtils.getStackTrace(e));
+                }
+            }
+
+            afterHandlerNetWorthStrategy.handler();
         }
     }
 
@@ -79,58 +97,6 @@ public class FundNetWorthGrab extends Grab {
             beforeHandlerNetWorthStrategy.handler();
         }
     }
-
-
-    /**
-     * 基金净值获取中 执行策略线程
-     */
-    class SingleRunnable implements Runnable {
-        private FundStore fundStore;
-        private BaseSingleNetWorthStrategy singleNetWorthStrategy;
-
-        SingleRunnable(FundStore fundStore, BaseSingleNetWorthStrategy singleNetWorthStrategy) {
-            this.fundStore = fundStore;
-            this.singleNetWorthStrategy = singleNetWorthStrategy;
-        }
-
-        @Override
-        public void run() {
-            List<Fund> fundList = this.fundStore.selectMulti("");
-            for (Fund fund : fundList) {
-                try {
-                    /**
-                     * 基金净值获取
-                     */
-                    List<FundNetWorth> fundNetWorthList = new ArrayList<FundNetWorth>();
-                    //List<FundNetWorth> fundNetWorthList = fundNetWorth(num, fund);
-                    /**
-                     * 单个基金净值获取后 策略执行
-                     */
-                    singleNetWorthStrategy.handler(fundNetWorthList, fund);
-                } catch (Exception e) {
-                    logger.error("error:{}", ExceptionUtils.getStackTrace(e));
-                }
-            }
-        }
-    }
-
-
-    /**
-     * 基金净值获取后 执行策略线程
-     */
-    class AfterRunnable implements Runnable {
-        private AfterHandlerNetWorthStrategy afterHandlerNetWorthStrategy;
-
-        AfterRunnable(AfterHandlerNetWorthStrategy afterHandlerNetWorthStrategy) {
-            this.afterHandlerNetWorthStrategy = afterHandlerNetWorthStrategy;
-        }
-
-        @Override
-        public void run() {
-            afterHandlerNetWorthStrategy.handler();
-        }
-    }
-
 
     /**
      * 基金净值

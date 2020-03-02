@@ -27,6 +27,7 @@ public class OkHttpUtils {
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(3, TimeUnit.SECONDS)
             .build();
+    private final static RateLimiter rateLimiter = RateLimiter.create(1000.0);;
 
     /**
      * 解析指定的url,指定的编码 为jsoup的document对象
@@ -129,7 +130,6 @@ public class OkHttpUtils {
      * @throws IOException
      */
     private static Response call(Object builder) throws IOException {
-        RateLimiter rateLimiter = RateLimiter.create(1000.0);
         if (rateLimiter.tryAcquire()) {
             rateLimiter.acquire();
             if (builder instanceof Request) {
