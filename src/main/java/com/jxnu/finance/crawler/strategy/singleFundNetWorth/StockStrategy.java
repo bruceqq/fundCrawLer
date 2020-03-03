@@ -48,7 +48,7 @@ public class StockStrategy extends BaseSingleNetWorthStrategy {
          */
         String fundCode = "";
         if (fund == null || StringUtils.isBlank(fundCode = fund.getCode())) return;
-        List<String> times = TimeUtil.latestYear(5);
+        List<String> times = TimeUtil.latestYear(2);
         List<StockExtra> stockExtras = new ArrayList<StockExtra>();
         for (String time : times) {
             String newUrl = "";
