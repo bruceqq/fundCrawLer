@@ -250,9 +250,18 @@ public class StockParseUtils {
             subject.contains("(行业平均)")) {
             subject = subject.replace("(行业平均)", "");
         }
-        grossProfitMargin = stockInfo.getDoubleValue("f49");
-        netInterestRate = stockInfo.getDoubleValue("f129");
-        roe = stockInfo.getDouble("f37");
+
+        if (!StringUtil.isBank(stockInfo.getString("f49"))) {
+            grossProfitMargin = stockInfo.getDoubleValue("f49");
+        }
+
+        if (!StringUtil.isBank(stockInfo.getString("f129"))) {
+            netInterestRate = stockInfo.getDoubleValue("f129");
+        }
+
+        if (!StringUtil.isBank(stockInfo.getString("f37"))) {
+            roe = stockInfo.getDouble("f37");
+        }
 
         stockIndicator.setTotalMarketValue(totalMarketValue.toString());
         stockIndicator.setNetWorth(netWorth.toString());
@@ -272,7 +281,9 @@ public class StockParseUtils {
             if (json != null) {
                 dataJson = json.getJSONObject("data");
                 if (dataJson != null) {
-                    stockIndicator.setQuarter(dataJson.getInteger("f62"));
+                    if (!StringUtil.isBank(dataJson.getString("f62"))) {
+                        stockIndicator.setQuarter(dataJson.getInteger("f62"));
+                    }
                 }
             }
         }
