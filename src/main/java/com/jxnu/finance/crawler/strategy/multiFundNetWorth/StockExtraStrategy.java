@@ -51,7 +51,7 @@ public class StockExtraStrategy extends AfterHandlerNetWorthStrategy {
                 stockNetWorthService.netWorth(stockCode);
             } catch (Exception e) {
             }
-            //reportDownLoadService.download(stockCode);
+            reportDownLoadService.download(stockCode);
             //stockPositionService.parse(stockCode);
             //stockFutureService.future(stockExtra);
         }

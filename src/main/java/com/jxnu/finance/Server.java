@@ -9,7 +9,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.concurrent.CountDownLatch;
 
-public class Server {
+public class
+Server {
     private final static Logger logger = LoggerFactory.getLogger(Server.class);
     public final static CountDownLatch countDownLatch = new CountDownLatch(1);
 

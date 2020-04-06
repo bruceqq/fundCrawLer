@@ -14,9 +14,10 @@ import java.util.concurrent.TimeUnit;
  * @date 2016-10-09ØØØ
  */
 public class MailUtil {
-    private final static Logger logger= LoggerFactory.getLogger(MailUtil.class);
-    private final static RateLimiter rateLimiter = RateLimiter.create(0.05);
-    public static void sendmail(String title,String text)  {
+    private final static Logger logger = LoggerFactory.getLogger(MailUtil.class);
+    private final static RateLimiter rateLimiter = RateLimiter.create(0.10);
+
+    public static void sendmail(String title, String text) {
         try {
             //发送简单邮件
             SimpleEmail email = new SimpleEmail();
@@ -29,12 +30,18 @@ public class MailUtil {
             //需要邮件发送服务器验证,用户名/密码
             email.setAuthentication("1247793952@qq.com", "ddnrrbkdolyugjac");
             email.setFrom("1247793952@qq.com");
-            email.addTo(new String[]{"15889326057@163.com","1092921095@qq.com"});
+            String[] mailTo = new String[]{"15889326057@163.com",
+                "yanwanp@163.com",
+                "1092921095@qq.com",
+                "2396631870@qq.com",
+                "913252620@qq.com"
+            };
+            email.addTo(mailTo);
 
             //设置主题的字符集为UTF-8
             email.setSubject(title);
             email.buildMimeMessage();
-            email.getMimeMessage().setContent(text,"text/html;charset=utf-8");
+            email.getMimeMessage().setContent(text, "text/html;charset=utf-8");
             if (rateLimiter.tryAcquire(1, TimeUnit.HOURS)) {
                 rateLimiter.acquire();
                 email.sendMimeMessage();

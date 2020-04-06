@@ -85,6 +85,7 @@ public class StockParseUtils {
                  */
                 String shareOutUrl = "http://dcfm.eastmoney.com/EM_MutiSvcExpandInterface/api/js/get?type=DCSOBS&token=70f12f2f4f091e459a279469fe49eca5&p=1&ps=50&sr=-1&st=ReportingPeriod&filter=&cmd=#&js=var%20CnPwAIGw={pages:(tp),data:(x)}&rt=52523179";
                 shareOutUrl = shareOutUrl.replace("#", stockCode);
+                stock.setPrice(StockParseUtils.stockPrice(stockCode));
                 shareOut(shareOutUrl, stock);
                 /**
                  * 股票名称
@@ -94,7 +95,6 @@ public class StockParseUtils {
                 stock.setStockName(stockNameElement.text());
                 stock.setFundCode(fundCode);
                 stock.setTime(time);
-                stock.setPrice(StockParseUtils.stockPrice(stockCode));
                 stock.setStockUrl(newStockUrl);
                 stock.setTotalShare(shares(stockCode));
                 stocks.add(stock);
@@ -321,6 +321,11 @@ public class StockParseUtils {
                     Double shareOut = Double.parseDouble(document.substring(document.indexOf("派") + 1, document.indexOf("元")).trim());
                     Float result = CalculateUtil.divide(shareOut.floatValue(), 10.0f, 4);
                     fundStock.setShareOut(result.toString());
+                }
+                if(!StringUtil.isBank(fundStock.getPrice())
+                    && !StringUtil.isBank(fundStock.getShareOut())){
+                    Float divide = CalculateUtil.divide(Float.valueOf(fundStock.getShareOut()), Float.parseFloat(fundStock.getPrice()), 4);
+                    fundStock.setShareOutRatio(divide.toString());
                 }
             } catch (Exception e) {
             }
